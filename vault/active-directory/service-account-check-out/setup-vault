@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
+
+cat <<EOF > /tmp/policies/domain-admins-policy.hcl
+path "ad/library/domain-admins" {
+  capabilities = ["update"]
+}
+EOF
+
+vault policy write domain-admins /tmp/policies/domain-admins-policy.hcl
+
+vault write auth/ldap/groups/engineering policies=security,my-application,domain-admins
+
+exit 0

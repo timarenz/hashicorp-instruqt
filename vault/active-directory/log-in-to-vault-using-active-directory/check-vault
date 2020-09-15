@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
+vault read secret/engineering/new-application
+if [ $? -ne 0 ]; then
+   fail-message "New secret at 'secret/engineering/new-application' was not created."
+fi
+
+vault read -field=my-value secret/engineering/new-application
+if [ $? -ne 0 ]; then
+   fail-message "Value 'my-value' at 'secret/engineering/new-application' was not created."
+fi
+
+exit 0

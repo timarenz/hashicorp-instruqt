@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
+vault auth enable ldap
+
+vault write auth/ldap/config \
+  binddn="cn=vault-bind,cn=Users,dc=hashicorp,dc=example" \
+  bindpass="P@ssword1" \
+  url="ldap://dc:389" \
+  userdn="cn=Users,dc=hashicorp,dc=example" \
+  userattr="sAMAccountName" \
+  groupdn="cn=Users,dc=hashicorp,dc=example" \
+  groupattr="cn"
+
+vault write auth/ldap/groups/security policies=security
+
+vault write auth/ldap/groups/engineering policies=engineering
+
+vault login -method=ldap username=alice password=P@ssword1
+
+exit 0

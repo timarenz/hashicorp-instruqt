@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
+vault write ad/roles/my-application \
+    service_account_name="my-application@hashicorp.example" \
+    ttl=15s \
+    max_ttl=30s
+
+vault read ad/creds/my-application
+
+exit 0

@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
+vault secrets enable ad
+
+vault write ad/config \
+    binddn="cn=vault-reset,cn=Users,dc=hashicorp,dc=example" \
+    bindpass=P@ssword1 \
+    url=ldaps://dc:636 \
+    userdn="dc=hashicorp,dc=example" \
+    insecure_tls=true
+
+vault write ad/library/domain-admins \
+    service_account_names=privileged-account@hashicorp.example \
+    ttl=1h \
+    max_ttl=8h \
+    disable_check_in_enforcement=false
+
+vault write ad/library/domain-admins/check-out ttl=30m
+
+vault write -f ad/library/domain-admins/check-in
+
+exit 0

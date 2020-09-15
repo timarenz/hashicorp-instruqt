@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
+vault read ad/library/domain-admins
+if [ $? -ne 0 ]; then
+   fail-message "You did not create the service account configuration for check-out."
+fi
+
+vault write -f ad/library/domain-admins/check-in || true
+vault write -f ad/library/domain-admins/check-out
+if [ $? -ne 0 ]; then
+   fail-message "The service account configuration for check-out is not correct."
+fi
+
+# grep -q "vault write ad/library/domain-admins/check-out ttl=30m" /root/.bash_history || fail-message "You didn't check out the account for 30 minutes."
+
+exit 0

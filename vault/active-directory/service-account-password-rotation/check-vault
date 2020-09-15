@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -e
+
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
+vault read ad/config
+if [ $? -ne 0 ]; then
+   fail-message "You did not create the Active Directory configuration."
+fi
+
+vault read ad/roles/my-application
+if [ $? -ne 0 ]; then
+   fail-message "You did not create the role 'my-application'."
+fi
+
+vault read ad/creds/my-application
+if [ $? -ne 0 ]; then
+   fail-message "The Active Directory configuration is not correct or you didn't create the 'my-application' role."
+fi
+
+exit 0

@@ -1,0 +1,30 @@
+#!/bin/sh
+
+set -e
+
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_TOKEN=root
+
+vault read auth/ldap/config
+if [ $? -ne 0 ]; then
+   fail-message "You did not create the LDAP configuration."
+fi
+
+vault read auth/ldap/groups/engineering
+if [ $? -ne 0 ]; then
+   fail-message "You did not create the 'engineering' group to policy mapping."
+fi
+
+vault read auth/ldap/groups/security
+if [ $? -ne 0 ]; then
+   fail-message "You did not create the 'security' group to policy mapping."
+fi
+
+# grep -q "vault login -method=ldap username=alice password=P@ssword1" /root/.bash_history || fail-message "You didn't log in as 'alice'"
+
+vault login -method=ldap username=alice password=P@ssword1
+if [ $? -ne 0 ]; then
+   fail-message 'Log in using Active Directory credentials not possible. Please check/redo LDAP configuration.'
+fi
+
+exit 0
